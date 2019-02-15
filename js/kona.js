@@ -5,6 +5,21 @@ $(document).ready(function() {
        e.preventDefault(); 
     });
     
+    
+    function header() {
+        $(window).on('scroll resize', function() {
+            var headerOffset = $('#header').offset().top;
+
+            $(document).on('scroll', function() {
+                if(headerOffset >= 10) {
+                    $('#header').addClass('on');
+                } else {
+                    $('#header').removeClass('on');
+                }
+            });
+        });
+    }
+    
     function main_visual_slide() {
         var $selector = $('#main .visual');
         var numSlide = $selector.find('ul.slide li').length;
@@ -98,6 +113,7 @@ $(document).ready(function() {
     } // end of gnbHover
     
     
+header()
 main_visual_slide();
 gnbHover();
 $('#main .visual').setSlideCover();
