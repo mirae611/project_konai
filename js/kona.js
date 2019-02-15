@@ -5,8 +5,6 @@ $(document).ready(function() {
        e.preventDefault(); 
     });
     
-    main_visual_slide();
-    
     function main_visual_slide() {
         var $selector = $('#main .visual');
         var numSlide = $selector.find('ul.slide li').length;
@@ -17,8 +15,7 @@ $(document).ready(function() {
         var timerId = '';
         var timerSpeed = 5000;
         var isTimerOn = false;
-
-
+        
         $selector.find('ul.indicator li a').on('click', function() {
             var index = $selector.find('ul.indicator li').index($(this).parent()) ;
             showSlide(index + 1);
@@ -33,7 +30,6 @@ $(document).ready(function() {
         showSlide(slideFirst);
 
         function showSlide(n) {
-            clearTimeout(timerId);
             $selector.find('ul.slide li').css({'display': 'none'});
             $selector.find('ul.slide li:eq('+ (n - 1) +')').css({'display': 'block', 'opacity': '0'}).stop(true).animate({'opacity': '1'}, 2000).addClass('on');
             $selector.find('ul.indicator li').removeClass('on');
@@ -45,15 +41,51 @@ $(document).ready(function() {
         };
     }; // end of main_visual_slide 
     
-    slideCover()
-    function slideCover() {
-        $(document).on('scroll', function() {
-           $('#main .visual .cover').css({'top': '0'});
-        });
-    }
+    
+    $.fn.setSlideCover = function(options) {
+        var settings = $.extend({
+            classPrefix: 'scroll'
+        }, options);
+
+        this.each(function() {
+            var $selector = $(this);
+            var scrollTop = 0;
+            var offsetTop = 0;
+            var windowHeight = 0;
+            var elementHeight = 0;
+            var startShow = 0;
+            var endShow = 0;
+            var classPrefix = settings.classPrefix;
+
+            slideCover();
+            $(window).on('scroll resize', function() {
+                slideCover();
+            });
+
+            function slideCover() {
+                scrollTop = $(document).scrollTop();
+                offsetTop = $selector.offset().top;
+                windowHeight = $(window).height();
+                elementHeight = $selector.outerHeight();
+                startShow = elementHeight - windowHeight;
+                endShow = offsetTop - windowHeight;
+
+                if (scrollTop < startShow) {
+                    $selector.removeClass(classPrefix + '-up ' + classPrefix + '-show');
+                    $selector.addClass(classPrefix + '-down');
+                } else if (scrollTop > endShow) {
+                    $selector.removeClass(classPrefix + '-down ' + classPrefix + '-show');
+                    $selector.addClass(classPrefix + '-up');
+                } else {
+                    $selector.removeClass(classPrefix + '-down ' + classPrefix + '-up ');
+                    $selector.addClass(classPrefix + '-show');
+                }
+            }
+
+        }); // end of each
+    }  // end of definition of setSlideCover
     
     
-    gnbHover()
     function gnbHover() {
         $('#header ul.gnb li a').on('mouseenter', function() {
             var index = $('#header ul.gnb li').index($(this).parent());
@@ -65,5 +97,9 @@ $(document).ready(function() {
         });
     } // end of gnbHover
     
+    
+main_visual_slide();
+gnbHover();
+$('#main .visual').setSlideCover();
+    
 }); // end of ready
-
